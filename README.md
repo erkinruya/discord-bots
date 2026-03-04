@@ -1,63 +1,23 @@
-# 🤖 Discord Bot Geliştirme Yol Haritası (Roadmap)
+# 🤖 Discord Moderasyon Botları Koleksiyonu
 
-Modern ve güçlü bir Discord botu geliştirmek için izlenmesi gereken adımları içeren bu yol haritası, temel kurulumdan ileri seviye özelliklere kadar size rehberlik edecektir.
+Bu depo (repository), modern Discord sunucularının ihtiyaçlarını karşılamak üzere tasarlanmış, **gelişmiş ve yenilikçi moderasyon botlarını** barındırmak amacıyla oluşturulmuştur. Temel amacı, geleneksel anahtar kelime tabanlı moderasyonun ötesine geçerek, olayları büyümeden engelleyebilen akıllı sistemler geliştirmektir.
 
-## 📍 1. Aşama: Planlama ve Hazırlık
-Her başarılı proje sağlam bir temel üzerine kurulur.
+## 🚀 Proje Hedefleri
+Bu koleksiyon kapsamında aşağıdaki özelliklere sahip çeşitli bot projeleri geliştirilecektir:
 
-- [ ] **Konsept Belirleme:** Botun amacı ne olacak? (Moderasyon, ekonomi, müzik, RPG, AI?)
-- [ ] **Dil ve Kütüphane Seçimi:**
-    - **JavaScript:** [discord.js](https://discord.js.org/) (En popüler seçim)
-    - **Python:** [discord.py](https://discordpy.readthedocs.io/) veya [disnake](https://disnake.dev/)
-- [ ] **Discord Developer Portal:** 
-    - [Geliştirici Portalı](https://discord.com/developers/applications)'ndan bir uygulama oluşturun.
-    - **Bot Token**'ınızı alın (Asla paylaşmayın!).
-    - **Privileged Gateway Intents** (Message Content, Server Members) ayarlarını yapılandırın.
+1. **Sentiguard AI (Duygu Analizli Moderatör):** Kanallardaki sohbetin "tansiyonunu" ölçer. İletişimdeki gerginliği yapay zeka ile analiz ederek, moderatörlere olaylar kavgaya dönüşmeden önce erken uyarı gönderir.
+2. **Guardian "Anti-Nuke" Core:** Sunucu yetkililerinin hesapları çalınsa (token grab vb.) bile sunucu sağlığını koruyan sistem. Kısa sürede gerçekleşen çoklu kanal silme veya banlama işlemlerini tespit ettiğinde, ilgili eylemleri yapan yetkilinin rolünü otomatik alır ve sunucuyu kilitler.
+3. **Cross-Server Blacklist (Ortak Kara Liste):** Güvenilir sunucular arasında ağı olan, bilinen kötü niyetli kullanıcıların (dolandırıcılar, raidciler) sunucuya girişini eşzamanlı olarak tespit eden ve engelleyen merkezi bir veritabanı.
+4. **Verification Architect (Gelişmiş Doğrulama):** Basit butonla veya reaksiyonla onaylama yerine; CAPTCHA, mini senaryolar veya hesap yaşını ve profil detaylarını (profil resmi olup olmadığı vb.) filtreleyerek olası bot saldırılarını (Raid) savuşturan gelişmiş giriş kontrol noktası.
+5. **Log-Master & Insights:** Sadece mesaj silinme ve düzenlenmelerini değil; yetkili hareketlerini, sesli kanal aktivitelerini detaylandırıp, haftalık olarak sunucu sağlığı raporları (En aktif kullanıcılar, en çok ceza alanlar vb.) çıkaran veri analiz botu.
 
-## ⚙️ 2. Aşama: Temel Altyapı
-Kodun sürdürülebilir olması için mimariyi kurun.
+## 📂 Depo Yapısı
+* `ROADMAP.md`: Projenin geliştirme süreçlerini ve vizyonunu barındıran detaylı yol haritası.
+* *Bot projeleri eklendikçe burada listelenecektir.*
 
-- [ ] **Proje Başlatma:** `npm init` veya `uv init` ile proje dosyasını oluşturun.
-- [ ] **Client Kurulumu:** Bota giriş yaptırın (`client.login()`).
-- [ ] **Handler Sistemi:** Komutları ve eventleri otomatik yükleyen bir `Command Handler` ve `Event Handler` yazın.
-- [ ] **Slash Commands:** Modern Discord kullanımı için `Application Commands` entegrasyonu yapın.
-- [ ] **Ortam Değişkenleri:** Token ve API anahtarları için `.env` dosyası kullanın.
-
-## 🛠️ 3. Aşama: Temel Özellikler
-Kullanıcıların etkileşime girebileceği ilk özellikleri ekleyin.
-
-- [ ] **Moderasyon:** `kick`, `ban`, `clear`, `mute` gibi temel komutlar.
-- [ ] **Bilgi Komutları:** Sunucu bilgisi, kullanıcı profili ve bot gecikme süresi (`ping`).
-- [ ] **Embed Mesajlar:** Görsel olarak zengin, renkli mesaj yapıları (`MessageEmbed`).
-- [ ] **Etkileşimli Bileşenler:** Butonlar (`Buttons`) ve Seçim Menüleri (`Select Menus`).
-
-## 📊 4. Aşama: Veritabanı ve Kalıcılık
-Verileri kaydetmeye başlayın.
-
-- [ ] **Veritabanı Seçimi:**
-    - **Basit:** SQLite (Hızlı başlangıç)
-    - **Güçlü:** MongoDB veya PostgreSQL
-- [ ] **ORM/Sürücü Entegrasyonu:** Mongoose (MongoDB) veya Prisma (SQL).
-- [ ] **Özellikler:** Kullanıcı seviye sistemi, özel sunucu ayarları (hoş geldin mesajı vb.).
-
-## 🚀 5. Aşama: İleri Seviye ve Entegrasyon
-Botunuzu benzersiz kılın.
-
-- [ ] **Dış API'ler:** Hava durumu, oyun istatistikleri veya döviz kurları için API bağlantıları.
-- [ ] **AI Entegrasyonu:** OpenAI veya Gemini API ile akıllı chatbot özellikleri.
-- [ ] **Müzik Sistemi:** `Lavalink` veya Discord'un yeni ses kütüphaneleri ile stabil müzik çalma.
-- [ ] **Web Dashboard:** Botu web üzerinden kontrol etmek için bir panel (Next.js veya Vue).
-
-## 🌍 6. Aşama: Yayınlama ve Bakım
-Botunuzu dünyaya açın.
-
-- [ ] **Hosting:** 
-    - **VDS/VPS:** DigitalOcean, Linode veya Hetzner.
-    - **PaaS:** Railway veya Render (Ücretsiz/Ucuz başlangıç).
-- [ ] **PM2 (Process Manager):** Botun 7/24 çalışmasını ve çökünce yeniden başlamasını sağlayın.
-- [ ] **Log Yönetimi:** Hataları izlemek için bir logger yapısı kurun.
-- [ ] **Discord Bot List:** Botunuzu `top.gg` gibi platformlara ekleyerek büyütün.
+## ⚙️ Gereksinimler & Kurulum
+* Node.js / Python (Botun türüne göre değişiklik gösterebilir)
+* Discord Developer Portal üzerinden alınmış **Bot Token** ve aktif edilmiş **Privileged Gateway Intents** (Özellikle *Message Content* ve *Server Members*).
 
 ---
-> [!TIP]
-> **Tavsiye:** Başlangıçta çok fazla özellik eklemeye çalışmak yerine, 2-3 temel özelliği mükemmelleştirip botu yayına alın, ardından güncellemelerle geliştirin.
+*Bu depo geliştirilme aşamasındadır. Fikirler ve mimariler detaylandırıldıkça güncellenecektir.*
