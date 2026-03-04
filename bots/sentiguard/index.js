@@ -4,6 +4,7 @@
  * ✅ Gemini AI Entegrasyonu (opsiyonel)
  * ✅ Event Bus (Blacklist'e sinyal)
  * ✅ Gerilim çubuğu, istatistikler
+ * ✅ Güvenli Dashboard İletişimi (HMAC-SHA256)
  */
 
 const { Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
@@ -11,10 +12,19 @@ const createLogger = require('../../shared/logger');
 const getDatabase = require('../../shared/db');
 const eventBus = require('../../shared/eventbus');
 const { registerCommands } = require('../../shared/commands');
+const { SecureDashboardClient } = require('../../shared/secure-client');
 require('dotenv').config();
 
 const log = createLogger('SENTIGUARD');
 const db = getDatabase('sentiguard');
+
+// --- Güvenli Dashboard Bağlantısı ---
+const dashboardClient = new SecureDashboardClient({
+    botName: 'sentiguard',
+    dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3000',
+    secret: process.env.MASTER_SECRET
+});
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -51,7 +61,7 @@ async function analyzeWithGemini(text) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `Analyze the toxicity of this Discord message on a scale of 0-10. Only respond with a JSON object like {"score": 5, "reason": "brief reason in Turkish"}. Message: "${text}"` }] }],
+                contents: [{ parts: [{ text: `Analyze the toxicity of this Discord message on a scale of 0-10. Only respond with a JSON object like {"score": 5, "reason": "brief reason in Turkish"}. Message: "${text}"` }],
                 generationConfig: { temperature: 0.1, maxOutputTokens: 100 }
             })
         });
@@ -134,6 +144,12 @@ eventBus.init('sentiguard');
 client.on('ready', async () => {
     log.info(`Logged in as ${client.user.tag}`);
     client.user.setPresence({ activities: [{ name: '🧠 Kanal Gerilimini İzliyor' }] });
+
+    // Dashboard'a bağlan
+    if (dashboardClient.enabled) {
+        await dashboardClient.reportStatus({ status: 'online', uptime: 0 });
+        log.info('Dashboard bağlantısı aktif');
+    }
 
     // Test Gemini
     if (GEMINI_API_KEY) {
@@ -285,6 +301,16 @@ client.on('messageCreate', async (message) => {
     if (score >= 2) {
         db.prepare('INSERT INTO warnings (guild_id, user_id, reason, score) VALUES (?, ?, ?, ?)').run(message.guild.id, message.author.id, reason, score);
 
+        // Dashboard'a bildir
+        if (dashboardClient.enabled) {
+            dashboardClient.reportEvent('warning', {
+                user_id: message.author.id,
+                guild_id: message.guild.id,
+                reason: reason,
+                score: score
+            });
+        }
+
         // Broadcast to event bus for other bots
         const userWarnings = db.prepare('SELECT COUNT(*) as c FROM warnings WHERE guild_id = ? AND user_id = ?').get(message.guild.id, message.author.id).c;
         if (userWarnings >= 5) {
@@ -319,6 +345,16 @@ client.on('messageCreate', async (message) => {
             .setTimestamp();
 
         logChannel.send({ embeds: [embed] });
+
+        // Dashboard'a yüksek gerilim bildir
+        if (dashboardClient.enabled) {
+            dashboardClient.reportEvent('high_tension', {
+                channel_id: message.channel.id,
+                guild_id: message.guild.id,
+                score: current,
+                threshold: config.threshold
+            });
+        }
 
         // Broadcast tension alert
         eventBus.broadcast('high_tension', { channelId: message.channel.id, guildId: message.guild.id, score: current });
