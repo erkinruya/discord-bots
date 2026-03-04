@@ -86,6 +86,63 @@ client.on('messageCreate', async (message) => {
                 .setDescription(warns.map((w, i) => `**${i + 1}.** ${w.reason} *(${w.created_at})*`).join('\n'));
             return message.reply({ embeds: [embed] });
         }
+
+        if (cmd === 'tension') {
+            const key = getTensionKey(message.guild.id, message.channel.id);
+            const score = channelTensionMap.get(key) || 0;
+            const config = db.prepare('SELECT * FROM guild_config WHERE guild_id = ?').get(message.guild.id);
+            const threshold = config?.threshold || 5;
+            const percent = Math.min(100, Math.round((score / threshold) * 100));
+            const bar = '█'.repeat(Math.floor(percent / 10)) + '░'.repeat(10 - Math.floor(percent / 10));
+
+            const embed = new EmbedBuilder()
+                .setTitle(`🌡️ Kanal Gerilim Durumu`)
+                .setColor(percent > 70 ? '#ff0000' : percent > 40 ? '#ffaa00' : '#00cc44')
+                .addFields(
+                    { name: 'Kanal', value: `<#${message.channel.id}>`, inline: true },
+                    { name: 'Skor', value: `${score}/${threshold}`, inline: true },
+                    { name: 'Seviye', value: `[${bar}] %${percent}` }
+                )
+                .setTimestamp();
+            return message.reply({ embeds: [embed] });
+        }
+
+        if (cmd === 'stats') {
+            const totalWarnings = db.prepare('SELECT COUNT(*) as c FROM warnings WHERE guild_id = ?').get(message.guild.id).c;
+            const last24h = db.prepare("SELECT COUNT(*) as c FROM warnings WHERE guild_id = ? AND created_at > datetime('now', '-1 day')").get(message.guild.id).c;
+            const topOffenders = db.prepare('SELECT user_id, COUNT(*) as c FROM warnings WHERE guild_id = ? GROUP BY user_id ORDER BY c DESC LIMIT 5').all(message.guild.id);
+            const activeChannels = [...channelTensionMap.entries()]
+                .filter(([k]) => k.startsWith(message.guild.id))
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+
+            const embed = new EmbedBuilder()
+                .setTitle(`📈 Sentiguard - Sunucu İstatistikleri`)
+                .setColor('#6666ff')
+                .addFields(
+                    { name: '⚠️ Toplam Uyarı', value: `${totalWarnings}`, inline: true },
+                    { name: '🕐 Son 24 Saat', value: `${last24h} uyarı`, inline: true },
+                    { name: '🔴 En Çok Uyarı Alanlar', value: topOffenders.length > 0 ? topOffenders.map((u, i) => `${i + 1}. <@${u.user_id}> — ${u.c} uyarı`).join('\n') : 'Kayıt yok' },
+                    { name: '🌡️ En Gergin Kanallar', value: activeChannels.length > 0 ? activeChannels.map(([k, v]) => `<#${k.split('-')[1]}> — Skor: ${v}`).join('\n') : 'Şu anda sakin 😌' }
+                )
+                .setTimestamp();
+            return message.reply({ embeds: [embed] });
+        }
+
+        if (cmd === 'help') {
+            const embed = new EmbedBuilder()
+                .setTitle('🧠 Sentiguard - Komut Listesi')
+                .setColor('#6666ff')
+                .setDescription([
+                    '`!sg setup #kanal [eşik]` — Log kanalını ve gerilim eşiğini ayarlar',
+                    '`!sg warnings @kullanici` — Kullanıcının uyarı geçmişi',
+                    '`!sg tension` — Bu kanalın gerilim durumu',
+                    '`!sg stats` — Sunucu geneli toksisite istatistikleri',
+                    '`!sg help` — Bu menüyü gösterir',
+                ].join('\n'));
+            return message.reply({ embeds: [embed] });
+        }
+
         return;
     }
 

@@ -1,23 +1,114 @@
 # 🤖 Discord Moderasyon Botları Koleksiyonu
 
-Bu depo (repository), modern Discord sunucularının ihtiyaçlarını karşılamak üzere tasarlanmış, **gelişmiş ve yenilikçi moderasyon botlarını** barındırmak amacıyla oluşturulmuştur. Temel amacı, geleneksel anahtar kelime tabanlı moderasyonun ötesine geçerek, olayları büyümeden engelleyebilen akıllı sistemler geliştirmektir.
+Modern Discord sunucularının güvenlik ve yönetim ihtiyaçlarını karşılamak üzere tasarlanmış, **bağımsız ama uyumlu** 5 moderasyon botu ve bir yönetim merkezinden oluşan bir koleksiyon.
 
-## 🚀 Proje Hedefleri
-Bu koleksiyon kapsamında aşağıdaki özelliklere sahip çeşitli bot projeleri geliştirilecektir:
+> ⚡ Her bot kendi başına çalışabilir. İstersen tek birini, istersen hepsini aynı anda kullanabilirsin.
 
-1. **Sentiguard AI (Duygu Analizli Moderatör):** Kanallardaki sohbetin "tansiyonunu" ölçer. İletişimdeki gerginliği yapay zeka ile analiz ederek, moderatörlere olaylar kavgaya dönüşmeden önce erken uyarı gönderir.
-2. **Guardian "Anti-Nuke" Core:** Sunucu yetkililerinin hesapları çalınsa (token grab vb.) bile sunucu sağlığını koruyan sistem. Kısa sürede gerçekleşen çoklu kanal silme veya banlama işlemlerini tespit ettiğinde, ilgili eylemleri yapan yetkilinin rolünü otomatik alır ve sunucuyu kilitler.
-3. **Cross-Server Blacklist (Ortak Kara Liste):** Güvenilir sunucular arasında ağı olan, bilinen kötü niyetli kullanıcıların (dolandırıcılar, raidciler) sunucuya girişini eşzamanlı olarak tespit eden ve engelleyen merkezi bir veritabanı.
-4. **Verification Architect (Gelişmiş Doğrulama):** Basit butonla veya reaksiyonla onaylama yerine; CAPTCHA, mini senaryolar veya hesap yaşını ve profil detaylarını (profil resmi olup olmadığı vb.) filtreleyerek olası bot saldırılarını (Raid) savuşturan gelişmiş giriş kontrol noktası.
-5. **Log-Master & Insights:** Sadece mesaj silinme ve düzenlenmelerini değil; yetkili hareketlerini, sesli kanal aktivitelerini detaylandırıp, haftalık olarak sunucu sağlığı raporları (En aktif kullanıcılar, en çok ceza alanlar vb.) çıkaran veri analiz botu.
+## 📦 Bot Koleksiyonu
 
-## 📂 Depo Yapısı
-* `ROADMAP.md`: Projenin geliştirme süreçlerini ve vizyonunu barındıran detaylı yol haritası.
-* *Bot projeleri eklendikçe burada listelenecektir.*
+| Bot | Prefix | Açıklama | Detay |
+|---|---|---|---|
+| 🧠 **Sentiguard** | `!sg` | Duygu & toksisite analizi, kanal gerilim takibi | [README →](bots/sentiguard/README.md) |
+| 🛡️ **Guardian** | `!guard` | Anti-Nuke & Anti-Raid koruma kalkanı | [README →](bots/guardian/README.md) |
+| 🔐 **Verifier** | `!verify` | Gelişmiş giriş doğrulama, şüpheli hesap filtreleme | [README →](bots/verifier/README.md) |
+| 📊 **LogMaster** | `!log` | Detaylı olay kaydı & haftalık rapor | [README →](bots/logmaster/README.md) |
+| 🚫 **Blacklist** | `!bl` | Sunucular arası kara liste sistemi | [README →](bots/blacklist/README.md) |
+| 🎛️ **Hub** | `!hub` | Tüm botları yöneten merkez | [README →](hub/README.md) |
 
-## ⚙️ Gereksinimler & Kurulum
-* Node.js / Python (Botun türüne göre değişiklik gösterebilir)
-* Discord Developer Portal üzerinden alınmış **Bot Token** ve aktif edilmiş **Privileged Gateway Intents** (Özellikle *Message Content* ve *Server Members*).
+## 🏗️ Proje Yapısı
+
+```
+discord-bots/
+├── hub/                    # 🎛️ Hub Yönetim Merkezi
+│   ├── index.js
+│   ├── .env.example
+│   └── README.md
+├── shared/                 # 🔗 Ortak Altyapı
+│   ├── logger.js           # Standart log formatı
+│   └── db.js               # SQLite veritabanı yardımcısı
+├── bots/
+│   ├── sentiguard/         # 🧠 Duygu & Toksisite
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env.example
+│   │   └── README.md
+│   ├── guardian/           # 🛡️ Anti-Nuke
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env.example
+│   │   └── README.md
+│   ├── verifier/           # 🔐 Giriş Doğrulama
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env.example
+│   │   └── README.md
+│   ├── logmaster/          # 📊 Olay Kaydı
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env.example
+│   │   └── README.md
+│   └── blacklist/          # 🚫 Kara Liste
+│       ├── index.js
+│       ├── package.json
+│       ├── .env.example
+│       └── README.md
+├── data/                   # 📁 Veritabanı dosyaları (gitignore)
+├── ROADMAP.md              # 🗺️ Geliştirme yol haritası
+├── .gitignore
+└── package.json
+```
+
+## 🚀 Hızlı Başlangıç
+
+### 1. Depoyu Klonla
+```bash
+git clone https://github.com/erkinruya/discord-bots.git
+cd discord-bots
+```
+
+### 2. Bağımlılıkları Kur
+```bash
+# Kök dizin (Hub için)
+npm install
+
+# Tek bir botu kurmak için
+cd bots/sentiguard && npm install
+```
+
+### 3. Token Ayarla
+```bash
+# İstediğin botun klasörüne gir
+cp bots/sentiguard/.env.example bots/sentiguard/.env
+# .env dosyasını aç ve token'ını yapıştır
+```
+
+### 4. Botu Çalıştır
+```bash
+# Doğrudan
+cd bots/sentiguard && npm start
+
+# Veya Hub üzerinden (tüm botları Discord'dan yönet)
+cd hub && npm start
+# Discord'da: !hub start sentiguard
+```
+
+## 🧩 Bağımsızlık & Uyumluluk Felsefesi
+
+Bu proje **"independent but compatible"** (bağımsız ama uyumlu) prensibiyle tasarlanmıştır:
+
+- **Bağımsız:** Her bot kendi `package.json`, `.env` ve SQLite veritabanına sahiptir. Herhangi bir botu tek başına çalıştırabilirsiniz.
+- **Uyumlu:** Tüm botlar aynı `shared/` altyapısını (logger, db) kullanır. Hub botu tüm botları merkezi olarak yönetebilir. Botlar arası veri paylaşımı (örn. Blacklist ↔ Guardian) mümkündür.
+
+## ⚙️ Gereksinimler
+
+- **Node.js** 18+
+- **npm** 9+
+- Discord Developer Portal'dan **Bot Token(lar)**
+- Aktif **Privileged Gateway Intents** (Message Content, Server Members)
+
+## 📄 Lisans
+
+MIT
 
 ---
-*Bu depo geliştirilme aşamasındadır. Fikirler ve mimariler detaylandırıldıkça güncellenecektir.*
+*Bu proje aktif geliştirme aşamasındadır. Katkıda bulunmak veya öneri paylaşmak için issue açabilirsiniz.*

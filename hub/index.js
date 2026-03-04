@@ -136,8 +136,89 @@ client.on('messageCreate', async (message) => {
 
     // Command: !hub restart <botname>
     if (command === 'restart') {
-        // To be implemented...
-        return message.reply("🔄 Yeniden başlatma komutu yakında çalışacak. Önce `stop` sonra `start` yapabilirsiniz.");
+        const botName = args[0];
+        if (!botName) return message.reply("Lütfen bir bot adı belirtin. Örn: `!hub restart sentiguard`");
+
+        const targetDir = path.join(botsDirectory, botName);
+        if (!fs.existsSync(targetDir)) return message.reply(`❌ \`${botName}\` adında bir klasör bulunamadı.`);
+
+        // Stop if running
+        if (activeBots.has(botName)) {
+            const processInfo = activeBots.get(botName);
+            processInfo.process.kill('SIGINT');
+            activeBots.delete(botName);
+        }
+
+        // Wait briefly, then restart
+        await new Promise(r => setTimeout(r, 1000));
+
+        const isPython = fs.existsSync(path.join(targetDir, 'main.py'));
+        const runCmd = isPython ? 'python' : 'node';
+        const runArgs = isPython ? ['main.py'] : ['.'];
+
+        try {
+            const botProcess = spawn(runCmd, runArgs, { cwd: targetDir });
+            activeBots.set(botName, { process: botProcess, startTime: Date.now() });
+
+            botProcess.stdout.on('data', (data) => console.log(`[${botName} - LOG] ${data}`));
+            botProcess.stderr.on('data', (data) => console.error(`[${botName} - ERR] ${data}`));
+            botProcess.on('close', (code) => { console.log(`[HUB] Bot ${botName} exited with code ${code}`); activeBots.delete(botName); });
+
+            return message.reply(`🔄 \`${botName}\` yeniden başlatıldı!`);
+        } catch (error) {
+            return message.reply(`❌ Yeniden başlatılırken hata oluştu: ${error.message}`);
+        }
+    }
+
+    // Command: !hub startall
+    if (command === 'startall') {
+        const folders = fs.readdirSync(botsDirectory, { withFileTypes: true })
+            .filter(d => d.isDirectory()).map(d => d.name);
+        let started = [];
+        for (const botName of folders) {
+            if (activeBots.has(botName)) continue;
+            const targetDir = path.join(botsDirectory, botName);
+            const isPython = fs.existsSync(path.join(targetDir, 'main.py'));
+            const runCmd = isPython ? 'python' : 'node';
+            const runArgs = isPython ? ['main.py'] : ['.'];
+            try {
+                const botProcess = spawn(runCmd, runArgs, { cwd: targetDir });
+                activeBots.set(botName, { process: botProcess, startTime: Date.now() });
+                botProcess.stdout.on('data', (data) => console.log(`[${botName} - LOG] ${data}`));
+                botProcess.stderr.on('data', (data) => console.error(`[${botName} - ERR] ${data}`));
+                botProcess.on('close', (code) => { activeBots.delete(botName); });
+                started.push(botName);
+            } catch (e) { /* skip */ }
+        }
+        return message.reply(`🚀 ${started.length} bot başlatıldı: ${started.map(b => `\`${b}\``).join(', ') || 'Hiçbiri'}`);
+    }
+
+    // Command: !hub stopall
+    if (command === 'stopall') {
+        const stopped = [];
+        for (const [botName, info] of activeBots) {
+            info.process.kill('SIGINT');
+            stopped.push(botName);
+        }
+        activeBots.clear();
+        return message.reply(`🛑 ${stopped.length} bot durduruldu: ${stopped.map(b => `\`${b}\``).join(', ') || 'Hiçbiri'}`);
+    }
+
+    // Command: !hub help
+    if (command === 'help') {
+        const embed = new EmbedBuilder()
+            .setTitle('🎛️ Hub - Komut Listesi')
+            .setColor('#0099ff')
+            .setDescription([
+                '`!hub status` — Tüm botların durumunu gösterir',
+                '`!hub start <bot>` — Belirtilen botu başlatır',
+                '`!hub stop <bot>` — Belirtilen botu durdurur',
+                '`!hub restart <bot>` — Belirtilen botu yeniden başlatır',
+                '`!hub startall` — Tüm botları başlatır',
+                '`!hub stopall` — Tüm botları durdurur',
+                '`!hub help` — Bu menüyü gösterir',
+            ].join('\n'));
+        return message.reply({ embeds: [embed] });
     }
 });
 
