@@ -1,0 +1,15 @@
+{
+    "name": "discord-bots-dashboard",
+    "version": "1.0.0",
+    "description": "Web Dashboard for Discord Bot Collection",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "node --watch index.js"
+    },
+    "dependencies": {
+        "express": "^5.1.0",
+        "better-sqlite3": "^11.8.1",
+        "dotenv": "^16.4.7"
+    }
+}
