@@ -1,0 +1,25 @@
+{
+  "name": "discord-bots",
+  "version": "1.0.0",
+  "description": "Modern ve güçlü bir Discord botu geliştirmek için izlenmesi gereken adımları içeren bu yol haritası, temel kurulumdan ileri seviye özelliklere kadar size rehberlik edecektir.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erkinruya/discord-bots.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/erkinruya/discord-bots/issues"
+  },
+  "homepage": "https://github.com/erkinruya/discord-bots#readme",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1"
+  }
+}
